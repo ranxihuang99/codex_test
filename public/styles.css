@@ -1,0 +1,292 @@
+:root {
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --line: #d9e1ec;
+  --text: #122238;
+  --muted: #52647d;
+  --brand: #1d4ed8;
+  --good: #0f766e;
+  --warn: #b45309;
+  --bad: #b91c1c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  background: radial-gradient(circle at top right, #dbeafe, transparent 35%), var(--bg);
+  color: var(--text);
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 18px 40px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 34px;
+}
+
+.hero p {
+  margin-top: 10px;
+  color: var(--muted);
+  max-width: 820px;
+}
+
+.panel {
+  margin-top: 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+}
+
+.search-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.search-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.search-form .inline-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.search-form .inline-check input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+.date-menu-group {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.date-menu-group label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+input,
+select,
+button {
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  font-size: 15px;
+  padding: 10px 12px;
+}
+
+input,
+select {
+  color: var(--text);
+  background: #fff;
+}
+
+button {
+  cursor: pointer;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+}
+
+button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button-secondary {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  color: #334155;
+}
+
+.button-secondary:hover:not([disabled]) {
+  background: #eef2f7;
+}
+
+.tip {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 14px;
+}
+
+.tip.warning {
+  background: #fff7ed;
+  border-color: #fed7aa;
+  color: #9a3412;
+}
+
+.status {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.meta-badge {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+.results {
+  display: grid;
+  gap: 10px;
+}
+
+.flight-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.flight-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.flight-id {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.flight-route {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.level {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.level.good {
+  background: #ecfdf5;
+  color: var(--good);
+}
+
+.level.mid {
+  background: #fffbeb;
+  color: var(--warn);
+}
+
+.level.bad {
+  background: #fef2f2;
+  color: var(--bad);
+}
+
+.detail-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  font-size: 14px;
+}
+
+.kv {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.kv .k {
+  color: var(--muted);
+  display: block;
+  font-size: 12px;
+}
+
+.kv .v {
+  font-weight: 600;
+}
+
+.reason-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: #334155;
+  font-size: 13px;
+}
+
+.reason-list li {
+  margin: 2px 0;
+}
+
+.footer-line {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.footer-line a {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .search-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .hero h1 {
+    font-size: 28px;
+  }
+
+  .search-form {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .date-menu-group {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}

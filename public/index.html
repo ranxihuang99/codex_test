@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>航班座椅避坑查询</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <h1>航班座椅避坑查询</h1>
+        <p>支持两种查询：按航线（起飞地+目的地）或按航班号（如 CZ8581）直查，并交叉 SeatMaps + AeroLOPA 数据，给出座椅与左右舷建议。</p>
+      </section>
+
+      <section class="panel">
+        <form id="search-form" class="search-form">
+          <label>
+            航班号（可选，直查）
+            <input id="flight" name="flight" list="flight-options" placeholder="例如 CZ8581 / MU5101" autocomplete="off" />
+          </label>
+
+          <label>
+            起飞地（城市或 IATA）
+            <input id="origin" name="origin" list="origin-options" placeholder="例如 深圳 / SZX / London" autocomplete="off" />
+          </label>
+
+          <label>
+            目的地（城市或 IATA）
+            <input id="destination" name="destination" list="destination-options" placeholder="例如 丽江 / LJG / Paris" autocomplete="off" />
+          </label>
+
+          <div class="date-menu-group" role="group" aria-label="出行日期">
+            <label>
+              年
+              <select id="year-select" name="year" required></select>
+            </label>
+            <label>
+              月
+              <select id="month-select" name="month" required></select>
+            </label>
+            <label>
+              日
+              <select id="day-select" name="day" required></select>
+            </label>
+          </div>
+
+          <label class="inline-check">
+            <input id="exclude-low-cost" name="excludeLowCost" type="checkbox" />
+            排除廉价航空（可选）
+          </label>
+
+          <button id="submit-btn" type="submit">开始查询</button>
+          <button id="clear-history-btn" type="button" class="button-secondary">清除历史记录</button>
+        </form>
+
+        <datalist id="flight-options"></datalist>
+        <datalist id="origin-options"></datalist>
+        <datalist id="destination-options"></datalist>
+
+        <div id="config-tip" class="tip warning hidden"></div>
+        <div id="status" class="status"></div>
+      </section>
+
+      <section id="result-wrap" class="panel hidden">
+        <div id="meta" class="meta"></div>
+        <div id="results" class="results"></div>
+      </section>
+
+      <section class="panel notes">
+        <h2>说明</h2>
+        <ul>
+          <li>本工具不使用本地数据库，每次请求实时查询。</li>
+          <li>若填写航班号，将优先按航班号直查（可不填起飞地/目的地）。</li>
+          <li>支持全球城市/机场输入，服务端会自动转换为机场三字码。</li>
+          <li>航班号可能在临近起飞时换机，建议出发前再次核对。</li>
+          <li>左右舷建议基于航线方位和太阳位置估算，用于观景/防晒辅助决策。</li>
+          <li>SeatMaps 或 AeroLOPA 解析失败时会标记“数据不足”。</li>
+        </ul>
+      </section>
+    </main>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: flight-seat-advisor
+    env: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: SEARCHAPI_KEY
+        sync: false

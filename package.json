@@ -1,0 +1,12 @@
+{
+  "name": "flight-seat-advisor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Realtime flight comfort advisor with SeatMaps cross-check (no local DB)",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
