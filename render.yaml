@@ -2,7 +2,7 @@ services:
   - type: web
     name: flight-seat-advisor
     env: docker
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     autoDeploy: true
     healthCheckPath: /api/health
