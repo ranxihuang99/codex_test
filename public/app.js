@@ -79,6 +79,11 @@ function formatSlimlineRiskLabel(risk) {
   return String(risk.label || "").trim() || "-";
 }
 
+function formatSeatList(seats) {
+  if (!Array.isArray(seats) || seats.length === 0) return "-";
+  return seats.join(" / ");
+}
+
 function getDaysInMonth(year, month) {
   return new Date(year, month, 0).getDate();
 }
@@ -407,6 +412,11 @@ function renderFlights(flights) {
       const windowSummary = flight.windowAdvice?.summary || "暂无左右舷建议";
       const exitRows = formatExitRows(flight.seatmaps?.exitRows);
       const exitSeatNumbers = formatExitSeatNumbers(flight.seatmaps?.exitSeatNumbers);
+      const restrictedReclineSeats = Array.isArray(flight.seatmaps?.restrictedReclineSeatNumbers)
+        ? flight.seatmaps.restrictedReclineSeatNumbers
+        : [];
+      const restrictedReclineCount = restrictedReclineSeats.length;
+      const restrictedReclineSeatList = formatSeatList(restrictedReclineSeats);
       const slimlineRiskLabel = formatSlimlineRiskLabel(flight.seatmaps?.slimlineRisk);
       const slimlineRiskReason = String(flight.seatmaps?.slimlineRisk?.reason || "").trim();
       const aerolopaMeta = [
@@ -434,12 +444,14 @@ function renderFlights(flights) {
             <div class="kv"><span class="k">防晒优先侧</span><span class="v">${escapeHtml(shadeSide)}</span></div>
             <div class="kv"><span class="k">安全出口排</span><span class="v">${escapeHtml(exitRows)}</span></div>
             <div class="kv"><span class="k">出口座位示例</span><span class="v">${escapeHtml(exitSeatNumbers)}</span></div>
+            <div class="kv"><span class="k">受限后仰座位</span><span class="v">${escapeHtml(restrictedReclineCount ? `${restrictedReclineCount}个` : "-")}</span></div>
             <div class="kv"><span class="k">超薄座椅风险</span><span class="v">${escapeHtml(slimlineRiskLabel)}</span></div>
           </div>
 
           <ul class="reason-list">${reasons}</ul>
           <div class="footer-line">建议：${escapeHtml(flight.comfort.advice)}</div>
           <div class="footer-line">左右舷：${escapeHtml(windowSummary)}</div>
+          <div class="footer-line">受限后仰清单：${escapeHtml(restrictedReclineSeatList)}</div>
           <div class="footer-line">超薄识别：${escapeHtml(slimlineRiskReason || "未获取到明确风险理由（建议结合值机座位图再确认）")}</div>
           <div class="footer-line">航班源：${escapeHtml(flight.raw?.source || "unknown")}${escapeHtml(inferredMark)}</div>
           <div class="footer-line">Seat 数据源：${seatmapsLink} · 置信度 ${escapeHtml(flight.seatmaps?.confidence || "low")}</div>
