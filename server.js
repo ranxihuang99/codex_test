@@ -1930,11 +1930,24 @@ function compareSeatLabels(a, b) {
   return String(pa[2] || "").localeCompare(String(pb[2] || ""));
 }
 
+function extractUniqueRowsFromSeatNumbers(seatNumbers) {
+  if (!Array.isArray(seatNumbers)) return [];
+  const rows = new Set();
+  for (const rawSeat of seatNumbers) {
+    const seat = String(rawSeat || "").trim().toUpperCase();
+    const match = seat.match(/^(\d{1,3})/);
+    if (!match) continue;
+    rows.add(Number(match[1]));
+  }
+  return Array.from(rows).sort((a, b) => a - b);
+}
+
 function extractSeatFeatureSummaryFromSeatmapHtml(html, seatmapId) {
   const seatTagRegex = /<div class="absolute comp-plane_seat[^>]*>/gi;
   const economyFeatureCounts = {};
   const economyExitRows = new Set();
   const economyExitSeats = new Set();
+  const economyRestrictedReclineRows = new Set();
   const economyLimitedReclineSeats = new Set();
   const economyDoNotReclineSeats = new Set();
   const economyRestrictedReclineSeats = new Set();
@@ -1969,11 +1982,13 @@ function extractSeatFeatureSummaryFromSeatmapHtml(html, seatmapId) {
       if (featureName === "limitedRecline") {
         economyLimitedReclineSeats.add(seatNumber);
         economyRestrictedReclineSeats.add(seatNumber);
+        if (rowNumber !== null) economyRestrictedReclineRows.add(rowNumber);
       }
 
       if (featureName === "doNotRecline") {
         economyDoNotReclineSeats.add(seatNumber);
         economyRestrictedReclineSeats.add(seatNumber);
+        if (rowNumber !== null) economyRestrictedReclineRows.add(rowNumber);
       }
     }
   }
@@ -1985,6 +2000,7 @@ function extractSeatFeatureSummaryFromSeatmapHtml(html, seatmapId) {
     featureCounts: economyFeatureCounts,
     exitRows: Array.from(economyExitRows).sort((a, b) => a - b),
     exitSeatNumbers: Array.from(economyExitSeats).sort(compareSeatLabels),
+    restrictedReclineRows: Array.from(economyRestrictedReclineRows).sort((a, b) => a - b),
     limitedReclineSeatNumbers: Array.from(economyLimitedReclineSeats).sort(compareSeatLabels),
     doNotReclineSeatNumbers: Array.from(economyDoNotReclineSeats).sort(compareSeatLabels),
     restrictedReclineSeatNumbers: Array.from(economyRestrictedReclineSeats).sort(compareSeatLabels)
@@ -1994,6 +2010,7 @@ function extractSeatFeatureSummaryFromSeatmapHtml(html, seatmapId) {
 function mergeSeatFeatureSummaries(summaries) {
   const rows = new Set();
   const seats = new Set();
+  const restrictedReclineRows = new Set();
   const limitedReclineSeats = new Set();
   const doNotReclineSeats = new Set();
   const restrictedReclineSeats = new Set();
@@ -2016,6 +2033,10 @@ function mergeSeatFeatureSummaries(summaries) {
 
     for (const seat of Array.isArray(summary.exitSeatNumbers) ? summary.exitSeatNumbers : []) {
       seats.add(seat);
+    }
+
+    for (const row of Array.isArray(summary.restrictedReclineRows) ? summary.restrictedReclineRows : []) {
+      restrictedReclineRows.add(row);
     }
 
     for (const seat of Array.isArray(summary.limitedReclineSeatNumbers) ? summary.limitedReclineSeatNumbers : []) {
@@ -2043,6 +2064,7 @@ function mergeSeatFeatureSummaries(summaries) {
     featureCounts,
     exitRows: Array.from(rows).sort((a, b) => a - b),
     exitSeatNumbers: Array.from(seats).sort(compareSeatLabels),
+    restrictedReclineRows: Array.from(restrictedReclineRows).sort((a, b) => a - b),
     limitedReclineSeatNumbers: Array.from(limitedReclineSeats).sort(compareSeatLabels),
     doNotReclineSeatNumbers: Array.from(doNotReclineSeats).sort(compareSeatLabels),
     restrictedReclineSeatNumbers: Array.from(restrictedReclineSeats).sort(compareSeatLabels)
@@ -2099,6 +2121,7 @@ function extractSeatmapMetrics(html, sourceUrl) {
     seatmapIds: extractSeatmapIdsFromAircraftPage(html),
     exitRows: [],
     exitSeatNumbers: [],
+    restrictedReclineRows: [],
     limitedReclineSeatNumbers: [],
     doNotReclineSeatNumbers: [],
     restrictedReclineSeatNumbers: [],
@@ -2182,6 +2205,7 @@ async function getSeatmapMetrics(airlineSlug, aircraftSlug) {
   if (seatFeatureSummary) {
     metrics.exitRows = seatFeatureSummary.exitRows;
     metrics.exitSeatNumbers = seatFeatureSummary.exitSeatNumbers.slice(0, 18);
+    metrics.restrictedReclineRows = seatFeatureSummary.restrictedReclineRows;
     metrics.limitedReclineSeatNumbers = seatFeatureSummary.limitedReclineSeatNumbers;
     metrics.doNotReclineSeatNumbers = seatFeatureSummary.doNotReclineSeatNumbers;
     metrics.restrictedReclineSeatNumbers = seatFeatureSummary.restrictedReclineSeatNumbers;
@@ -2463,6 +2487,7 @@ function mergeSeatMetrics(seatmapsMetrics, aerolopaMetrics) {
     seatmapIds: Array.isArray(seatmapsMetrics?.seatmapIds) ? seatmapsMetrics.seatmapIds : [],
     exitRows: Array.isArray(seatmapsMetrics?.exitRows) ? seatmapsMetrics.exitRows : [],
     exitSeatNumbers: Array.isArray(seatmapsMetrics?.exitSeatNumbers) ? seatmapsMetrics.exitSeatNumbers : [],
+    restrictedReclineRows: Array.isArray(seatmapsMetrics?.restrictedReclineRows) ? seatmapsMetrics.restrictedReclineRows : [],
     limitedReclineSeatNumbers: Array.isArray(seatmapsMetrics?.limitedReclineSeatNumbers) ? seatmapsMetrics.limitedReclineSeatNumbers : [],
     doNotReclineSeatNumbers: Array.isArray(seatmapsMetrics?.doNotReclineSeatNumbers) ? seatmapsMetrics.doNotReclineSeatNumbers : [],
     restrictedReclineSeatNumbers: Array.isArray(seatmapsMetrics?.restrictedReclineSeatNumbers) ? seatmapsMetrics.restrictedReclineSeatNumbers : [],
@@ -2830,8 +2855,11 @@ function scoreComfort(metrics, slimlineRisk = null) {
     reasons.push("未解析到安全出口排座位标注");
   }
 
-  if (Array.isArray(metrics.restrictedReclineSeatNumbers) && metrics.restrictedReclineSeatNumbers.length > 0) {
-    reasons.push(`受限后仰座位（${metrics.restrictedReclineSeatNumbers.length}个）：${metrics.restrictedReclineSeatNumbers.join(" / ")}`);
+  const restrictedReclineRows = Array.isArray(metrics.restrictedReclineRows) && metrics.restrictedReclineRows.length > 0
+    ? metrics.restrictedReclineRows
+    : extractUniqueRowsFromSeatNumbers(metrics.restrictedReclineSeatNumbers);
+  if (restrictedReclineRows.length > 0) {
+    reasons.push(`受限后仰排：${restrictedReclineRows.join("、")}排`);
   }
 
   let level = "偏拥挤风险";
@@ -2921,6 +2949,9 @@ async function enrichFlightWithSeatmaps(flight, airlineMap, airportByIata) {
       seatmapIds: mergedMetrics?.seatmapIds || [],
       exitRows: mergedMetrics?.exitRows || [],
       exitSeatNumbers: mergedMetrics?.exitSeatNumbers || [],
+      restrictedReclineRows: Array.isArray(mergedMetrics?.restrictedReclineRows) && mergedMetrics.restrictedReclineRows.length > 0
+        ? mergedMetrics.restrictedReclineRows
+        : extractUniqueRowsFromSeatNumbers(mergedMetrics?.restrictedReclineSeatNumbers),
       limitedReclineSeatNumbers: mergedMetrics?.limitedReclineSeatNumbers || [],
       doNotReclineSeatNumbers: mergedMetrics?.doNotReclineSeatNumbers || [],
       restrictedReclineSeatNumbers: mergedMetrics?.restrictedReclineSeatNumbers || [],
