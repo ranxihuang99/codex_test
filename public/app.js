@@ -84,6 +84,31 @@ function formatSeatList(seats) {
   return seats.join(" / ");
 }
 
+function formatSeatListByRow(seats) {
+  if (!Array.isArray(seats) || seats.length === 0) return "-";
+
+  const grouped = new Map();
+  for (const rawSeat of seats) {
+    const seat = String(rawSeat || "").trim().toUpperCase();
+    if (!seat) continue;
+
+    const match = seat.match(/^(\d{1,3})([A-Z]+)?$/);
+    if (!match) continue;
+    const row = match[1];
+
+    if (!grouped.has(row)) {
+      grouped.set(row, []);
+    }
+    grouped.get(row).push(seat);
+  }
+
+  if (grouped.size === 0) return formatSeatList(seats);
+
+  return Array.from(grouped.entries())
+    .map(([row, rowSeats]) => `${row}排: ${rowSeats.join(" / ")}`)
+    .join("；");
+}
+
 function getDaysInMonth(year, month) {
   return new Date(year, month, 0).getDate();
 }
@@ -417,6 +442,7 @@ function renderFlights(flights) {
         : [];
       const restrictedReclineCount = restrictedReclineSeats.length;
       const restrictedReclineSeatList = formatSeatList(restrictedReclineSeats);
+      const restrictedReclineSeatListByRow = formatSeatListByRow(restrictedReclineSeats);
       const slimlineRiskLabel = formatSlimlineRiskLabel(flight.seatmaps?.slimlineRisk);
       const slimlineRiskReason = String(flight.seatmaps?.slimlineRisk?.reason || "").trim();
       const aerolopaMeta = [
@@ -451,6 +477,7 @@ function renderFlights(flights) {
           <ul class="reason-list">${reasons}</ul>
           <div class="footer-line">建议：${escapeHtml(flight.comfort.advice)}</div>
           <div class="footer-line">左右舷：${escapeHtml(windowSummary)}</div>
+          <div class="footer-line">受限后仰分组：${escapeHtml(restrictedReclineSeatListByRow)}</div>
           <div class="footer-line">受限后仰清单：${escapeHtml(restrictedReclineSeatList)}</div>
           <div class="footer-line">超薄识别：${escapeHtml(slimlineRiskReason || "未获取到明确风险理由（建议结合值机座位图再确认）")}</div>
           <div class="footer-line">航班源：${escapeHtml(flight.raw?.source || "unknown")}${escapeHtml(inferredMark)}</div>
