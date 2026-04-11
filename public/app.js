@@ -69,11 +69,6 @@ function formatExitRows(rows) {
   return `${rows.join("、")}排`;
 }
 
-function formatExitSeatNumbers(seats, limit = 10) {
-  if (!Array.isArray(seats) || seats.length === 0) return "-";
-  return seats.slice(0, limit).join(" / ");
-}
-
 function formatSlimlineRiskLabel(risk) {
   if (!risk || typeof risk !== "object") return "-";
   return String(risk.label || "").trim() || "-";
@@ -423,7 +418,6 @@ function renderFlights(flights) {
       const shadeSide = flight.windowAdvice?.shadeSideLabel || "-";
       const windowSummary = flight.windowAdvice?.summary || "暂无左右舷建议";
       const exitRows = formatExitRows(flight.seatmaps?.exitRows);
-      const exitSeatNumbers = formatExitSeatNumbers(flight.seatmaps?.exitSeatNumbers);
       const restrictedReclineRowsRaw = Array.isArray(flight.seatmaps?.restrictedReclineRows)
         ? flight.seatmaps.restrictedReclineRows
         : [];
@@ -457,7 +451,6 @@ function renderFlights(flights) {
             <div class="kv"><span class="k">观景优先侧</span><span class="v">${escapeHtml(scenicSide)}</span></div>
             <div class="kv"><span class="k">防晒优先侧</span><span class="v">${escapeHtml(shadeSide)}</span></div>
             <div class="kv"><span class="k">安全出口排</span><span class="v">${escapeHtml(exitRows)}</span></div>
-            <div class="kv"><span class="k">出口座位示例</span><span class="v">${escapeHtml(exitSeatNumbers)}</span></div>
             <div class="kv"><span class="k">受限后仰排说明</span><span class="v">${escapeHtml(restrictedReclineRowsText)}</span></div>
             <div class="kv"><span class="k">超薄座椅风险</span><span class="v">${escapeHtml(slimlineRiskLabel)}</span></div>
           </div>
