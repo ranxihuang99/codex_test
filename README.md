@@ -1,5 +1,14 @@
 # Flight Seat Advisor (No Local DB)
 
+## Voice Edit Demo
+
+仓库同时提供一个独立的、单文件语音触屏交互演示：
+
+- 本地路径：`public/voice-edit-demo.html`
+- Render 路径：`/voice-edit-demo.html`
+
+该页面的图片与交互资源均内嵌在 HTML 中，可直接通过浏览器访问和分享。
+
 一个不落本地数据库的航班座椅避坑查询网页：
 
 - 输入 `起飞地 + 目的地 + 日期`
